@@ -1,37 +1,36 @@
 #!/usr/bin/env groovy
+package com.oldmutual.iop
 
-//import com.oldmutual.iop.JMSConfiguration
-//import com.oldmutual.iop.JMSClient
+import com.oldmutual.iop.JMSConfiguration
+import com.oldmutual.iop.JMSClient
 
 File inFile = new File('jmsconfig.properties')
 Properties configs = readPropsFile(inFile)
 
 configs.each { key, value -> println("$key, $value") }
-/*
+
 JMSConfiguration jmsConfig = new JMSConfiguration()
 
 jmsConfig.hostname = configs.get('hostname')
-jmsConfig.port = configs.get('port')
+jmsConfig.port = Integer.valueOf(configs.get('port'))
 jmsConfig.qmanager = configs.get('qmanager')
 jmsConfig.channel = configs.get('channel')
 jmsConfig.destination = configs.get('destination')
 jmsConfig.userID = configs.get('userID')
-jmsConfig.password = configs.get('password')
+jmsConfig.passwd = configs.get('passwd')
 
-String msg = 'The vinnige bruin jakals is mal en hardloop heen en weer sonder rigting waarna hy oor die lui hond spring.'
+String msg = 'The quick brown fox jumps over the lazy dog.'
 
 JMSClient jmsC = new JMSClient()
 
-assertTrue jmsC.write(jmsConfig, msg)
+jmsC.write(jmsConfig, msg)
 
-println('Message sent: $msg')
-println
+println("Message sent: $msg")
 
-assertTrue msg == jmsC.read(jmsConfig)
+String rmsg == jmsC.read(jmsConfig)
 
-println('Message received: $msg')
-println
-*/
+println("Message received: $rmsg")
+
 Properties readPropsFile(File fProps) {
 
  if (!fProps.exists()) {
