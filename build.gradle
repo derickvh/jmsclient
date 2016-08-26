@@ -1,0 +1,22 @@
+/*
+ * build.gradle
+ */
+
+
+
+// Apply the java plugin to add support for Java
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'com.oldmutual.iop.JMSClient'
+
+repositories {
+	jcenter()
+}
+
+dependencies {
+
+	compile files('/home/derick/wmqlibs/com.ibm.mq.allclient.jar','/home/derick/wmqlibs/jms.jar')
+
+	testCompile "junit:junit:4.11"
+}
