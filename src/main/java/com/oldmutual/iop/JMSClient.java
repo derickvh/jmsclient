@@ -39,30 +39,60 @@ public class JMSClient {
 	 * Reads a message from a JMS destination.
 	 * 
 	 * @param jmsConfig
-	 *            An instance of the Bean/Data class JMSConfiguration
+	 *            An instance of the Bean/Data class JMSConfiguration.
 	 * @return Returns the body of the message, which is expected to be of type
-	 *         'TextMessage'.
-	 * @throws JMSException
+	 *         'TextMessage'. Waits for 5 seconds for a message before returning.
+	 * 
 	 */
 
-	public String read(JMSConfiguration jmsConfig) throws JMSException {
+	public String read(JMSConfiguration jmsConfig) {
 
-		QueueConnection queueConnection = initJMS(new MQQueueConnectionFactory(), jmsConfig);
+		QueueConnection queueConnection = null;
+		String returnString = null;
 
-		queueConnection.start();
+		try {
 
-		Queue queue = new MQQueue(jmsConfig.getDestination());
-		QueueSession session = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-		QueueReceiver queueRcvr = session.createReceiver(queue);
+			queueConnection = initJMS(new MQQueueConnectionFactory(), jmsConfig);
+			queueConnection.start();
 
-		Message msg = queueRcvr.receive(5L);
-		String returnString = ((TextMessage) msg).getText();
+			Queue queue = new MQQueue(jmsConfig.getDestination());
+			QueueSession session = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+			QueueReceiver queueRcvr = session.createReceiver(queue);
 
-		queueConnection.close();
-		
-		return returnString != null ?  returnString : "No message or wrong message type.";
+			Message msg = queueRcvr.receive(5L);
+			
+			returnString = ((TextMessage) msg).getText();
+
+		} catch (JMSException e) {
+
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		} finally {
+
+			try {
+
+				queueConnection.close();
+
+			} catch (JMSException e) {
+
+				System.out.println("Failed to close JMS Queue Connection.");
+				e.printStackTrace();
+			}
+		}
+		return returnString != null ? returnString : "No message or wrong message type.";
 	}
 
+	/**
+	 * Writes a message to a JMS destination.
+	 * 
+	 * @param jmsConfig.
+	 *            A configuration object that contains all the details for
+	 *            connecting to a JMS destination
+	 * @param text.
+	 *            The message that must be sent to the JMS destination. @return.
+	 *            Returns true if the message was successfully transmitted.
+	 */
 	public boolean write(JMSConfiguration jmsConfig, String text) {
 
 		boolean returnBool = true;
@@ -81,24 +111,25 @@ public class JMSClient {
 			qSender.send(msg);
 
 		} catch (JMSException e) {
-			
+
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			returnBool = false;
-			
+
 		} finally {
 
 			if (queueConnection != null) {
 
 				try {
 					queueConnection.close();
-					
+
 				} catch (JMSException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} 
+				}
 			}
 		}
 		return returnBool;
 	}
 }
+

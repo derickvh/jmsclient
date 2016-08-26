@@ -1,15 +1,18 @@
-package com.oldmutual.iop.test;
+package com.oldmutual.iop;
 
-import javax.jms.JMSException;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 import com.oldmutual.iop.JMSClient;
 import com.oldmutual.iop.JMSConfiguration;
 
 public class JMSClientTest {
 
-	public static void main(String[] args) throws JMSException {
-		
-		String textMsg = args[0];
+	@Test
+	public void test() {
+
+		String textMsg = "The quick brown fox jumps over the lazy dog.";
 		
 		JMSConfiguration jmsC = new JMSConfiguration();
 		
@@ -23,16 +26,19 @@ public class JMSClientTest {
 		
 		JMSClient jmsClient = new JMSClient();
 		
-		org.junit.Assert.assertTrue(jmsClient.write(jmsC, textMsg));
+		assertTrue(jmsClient.write(jmsC, textMsg));
 		
 		System.out.print(textMsg);
 		System.out.println(" sent successfully");
 		
-		String returnTxt = jmsClient.read(jmsC);
+		String returnTxt = null;
+		
+		returnTxt = jmsClient.read(jmsC);
 				
-		org.junit.Assert.assertTrue(returnTxt.startsWith(textMsg));
+		assertTrue(returnTxt.startsWith(textMsg));
 		
 		System.out.print(returnTxt);
 		System.out.println(" read successfully");
 	}
 }
+

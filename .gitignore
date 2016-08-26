@@ -1,11 +1,6 @@
-**/*.class
-**/*.tar
-**/*.zip
-**/*.jar
-**/*.bin
-
+build/*
 .project
-**/*~
+**/*.*~
 
 
 
