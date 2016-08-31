@@ -21,13 +21,11 @@ jmsConfig.passwd = configs.get('passwd')
 
 String msg = 'The quick brown fox jumps over the lazy dog.'
 
-JMSClient jmsC = new JMSClient()
-
-jmsC.write(jmsConfig, msg)
+JMSClient.write(jmsConfig, msg)
 
 println("Message sent: $msg")
 
-String rmsg == jmsC.read(jmsConfig)
+String rmsg = JMSClient.read(jmsConfig)
 
 println("Message received: $rmsg")
 

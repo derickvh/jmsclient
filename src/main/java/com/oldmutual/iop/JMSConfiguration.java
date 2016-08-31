@@ -1,13 +1,34 @@
 package com.oldmutual.iop;
 
+import javax.xml.bind.annotation.*;
+
+@XmlRootElement(name="JMSConfiguration", namespace="##default")
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = {
+    "hostname",
+    "port",
+    "qmanager",
+    "channel",
+    "userID",
+    "passwd",
+    "destination"
+})
+
 public class JMSConfiguration {
 	
+	@XmlElement(name="hostname", required=true)
 	private String hostname;
+	@XmlElement(name="port", required=false)
 	private int port;
+	@XmlElement(name="qmanager", required=true)
 	private String qmanager;
+	@XmlElement(name="channel", required=true)
 	private String channel;
+	@XmlElement(name="userID", required=false)
 	private String userID;
+	@XmlElement(name="passwd", required=false)
 	private String passwd;
+	@XmlElement(name="destination", required=true)
 	private String destination;
 	
 	public JMSConfiguration() {
@@ -63,7 +84,4 @@ public class JMSConfiguration {
 	public void setDestination(String destination) {
 		this.destination = destination;
 	}
-	
-	
-
 }
