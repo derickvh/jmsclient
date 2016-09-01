@@ -1,9 +1,6 @@
 
 package com.oldmutual.iop;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Queue;
@@ -17,7 +14,9 @@ import javax.jms.TextMessage;
 import com.ibm.mq.jms.MQQueue;
 import com.ibm.mq.jms.MQQueueConnectionFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
-import com.oldmutual.iop.JMSConfiguration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class JMSClient {
 
@@ -32,12 +31,13 @@ public class JMSClient {
 	/**
 	 * Initialises JMS objects and returns a QueueConnection object
 	 *
-	 * @param qcf.
+	 * @param qcf
 	 *            MQQueueConnectionFactory
-	 * @param jmsConfig.
+	 * @param jmsConfig
 	 *            A JMSConfiguration object
 	 * @return A queue connection object
 	 * @throws JMSException
+     * Throws a JMS exception.
 	 */
 
 	private static QueueConnection initJMS(MQQueueConnectionFactory qcf, JMSConfiguration jmsConfig)
@@ -63,12 +63,6 @@ public class JMSClient {
 	 *
 	 */
 
-	/**
-	 * Reads a single message from JMS destination.
-	 *
-	 * @param jmsConfig
-	 * @return The message read.
-	 */
 	public static String read(JMSConfiguration jmsConfig) {
 
 		String returnString = null;
@@ -97,14 +91,14 @@ public class JMSClient {
 	/**
 	 * Reads multiple messages from a JMS destination.
 	 *
-	 * @param jmsConfig.
+	 * @param jmsConfig
 	 *            Instance of a JMS Configuration bean.
 	 * @return A list of messages read.
 	 */
 
-	public static ArrayList<String> readMany(JMSConfiguration jmsConfig) {
+	public static List<String> readMany(JMSConfiguration jmsConfig) {
 
-		ArrayList<String> msgs = new ArrayList<>();
+		List<String> msgs = new ArrayList<>();
 
 		try (QueueConnection queueConnection = initJMS(new MQQueueConnectionFactory(), jmsConfig)) {
 
@@ -114,7 +108,7 @@ public class JMSClient {
 			Queue queue = new MQQueue(jmsConfig.getDestination());
 			QueueReceiver queueRcvr = session.createReceiver(queue);
 
-			Message msg = null;
+			Message msg;
 
 			while ((msg = queueRcvr.receiveNoWait()) != null) {
 
@@ -132,10 +126,10 @@ public class JMSClient {
 	/**
 	 * Writes a message to a JMS destination.
 	 *
-	 * @param jmsConfig.
+	 * @param jmsConfig
 	 *            A configuration object that contains all the details for
 	 *            connecting to a JMS destination
-	 * @param text.
+	 * @param text
 	 *            The message that must be sent to the JMS destination. @return.
 	 *            Returns true if the message was successfully transmitted.
 	 */
@@ -167,18 +161,18 @@ public class JMSClient {
 	/**
 	 * Writes multiple messages to a JMS destination.
 	 *
-	 * @param jmsConfig.
+	 * @param jmsConfig
 	 *            A configuration object that contains all the details for
 	 *            connecting to a JMS destination
-	 * @param msgs.
+	 * @param msgs
 	 *            An array of messages that must be sent to the JMS destination.
 	 *
-	 * 			@return. Returns true if the messages were successfully
+	 * 			@return Returns true if the messages were successfully
 	 *            transmitted.
 	 *
 	 **/
 
-	public static boolean writeMany(JMSConfiguration jmsConfig, ArrayList<String> msgs) {
+	public static boolean writeMany(JMSConfiguration jmsConfig, List<String> msgs) {
 
 		boolean returnBool = true;
 
@@ -190,12 +184,11 @@ public class JMSClient {
 			Queue queue = new MQQueue(jmsConfig.getDestination());
 			QueueSender qSender = session.createSender(queue);
 
-			Iterator<String> it = msgs.iterator();
 			Message msg;
 
-			while (it.hasNext()) {
+			for (String msgTxt : msgs) {
 
-				msg = session.createTextMessage(it.next());
+				msg = session.createTextMessage(msgTxt);
 				qSender.send(msg);
 			}
 

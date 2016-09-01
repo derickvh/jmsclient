@@ -1,8 +1,5 @@
 package com.oldmutual.iop;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-
 import org.junit.Test;
 import org.junit.BeforeClass;
 
@@ -12,10 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
-import com.oldmutual.iop.JMSClient;
-import com.oldmutual.iop.JMSConfiguration;
+import static org.junit.Assert.*;
 
 public class JMSClientTest {
 
@@ -48,11 +44,9 @@ public class JMSClientTest {
 	@Test
 	public void testRead() {
 
-				String returnTxt = null;
+		String returnTxt = JMSClient.read(jmsC);
 
-				returnTxt = JMSClient.read(jmsC);
-
-				assertTrue(returnTxt != null);
+		assertTrue(returnTxt != null);
 
 				System.out.print(returnTxt);
 				System.out.println(" read successfully");
@@ -65,7 +59,7 @@ public class JMSClientTest {
 
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
 
-				ArrayList<String> msgs = new ArrayList<>();
+				List<String> msgs = new ArrayList<>();
 
 				for (Path entry : stream) {
 
@@ -86,8 +80,9 @@ public class JMSClientTest {
 	@Test
 	public void testReadMany() {
 
-		ArrayList<String> msgs = JMSClient.readMany(jmsC);
+		List<String> msgs = JMSClient.readMany(jmsC);
 
-		assertFalse(msgs.isEmpty());
+        assertEquals(10, msgs.size());
+		System.out.println("Read " + msgs.size() + " messages");
 	}
 }
