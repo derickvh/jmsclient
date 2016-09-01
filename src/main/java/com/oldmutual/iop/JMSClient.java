@@ -75,7 +75,7 @@ public class JMSClient {
 			Queue queue = new MQQueue(jmsConfig.getDestination());
 			QueueReceiver queueRcvr = session.createReceiver(queue);
 
-			Message msg = queueRcvr.receiveNoWait();
+			Message msg = queueRcvr.receive(jmsConfig.getTimeout());
 
             if (msg != null) {
 

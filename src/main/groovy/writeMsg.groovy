@@ -7,6 +7,7 @@ import static com.oldmutual.iop.JMSClient.write
  * Created by derick on 2016/09/01.
  */
 import static java.lang.Integer.valueOf
+import static java.lang.Long.parseLong
 
 File inFile = new File('jmsconfig.properties')
 Properties configs = readPropsFile(inFile)
@@ -20,6 +21,7 @@ jmsConfig.channel = configs['channel']
 jmsConfig.destination = configs['destination']
 jmsConfig.userID = configs['userID']
 jmsConfig.passwd = configs['passwd']
+jmsConfig.timeout = parseLong((String) configs['timeout'])
 
 def msg = "The quick brown fox is 'n vervlakste skelm en lui jakkals."
 
@@ -37,6 +39,4 @@ static Properties readPropsFile(File fProps) {
     fProps.withInputStream { stream -> props.load(stream) }
     return props
 }
-/**
- * Created by derick on 2016/09/01.
- */
+

@@ -2,11 +2,8 @@
 package com.oldmutual.iop
 
 import static com.oldmutual.iop.JMSClient.read
-
-/**
- * Created by derick on 2016/09/01.
- */
 import static java.lang.Integer.valueOf
+import static java.lang.Long.parseLong
 
 File inFile = new File('jmsconfig.properties')
 Properties configs = readPropsFile(inFile)
@@ -20,6 +17,7 @@ jmsConfig.channel = configs['channel']
 jmsConfig.destination = configs['destination']
 jmsConfig.userID = configs['userID']
 jmsConfig.passwd = configs['passwd']
+jmsConfig.timeout = parseLong((String) configs['timeout'])
 
 def msg = read(jmsConfig)
 
