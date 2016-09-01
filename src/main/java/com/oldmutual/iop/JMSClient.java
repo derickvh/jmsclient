@@ -77,7 +77,14 @@ public class JMSClient {
 
 			Message msg = queueRcvr.receiveNoWait();
 
-			returnString = ((TextMessage) msg).getText();
+            if (msg != null) {
+
+                returnString = ((TextMessage) msg).getText();
+
+            } else {
+
+                returnString = "No Message Read";
+            }
 
 		} catch (JMSException e) {
 
@@ -85,7 +92,7 @@ public class JMSClient {
 			e.printStackTrace();
 
 		}
-		return returnString != null ? returnString : "No message or wrong message type.";
+		return returnString;
 	}
 
 	/**
