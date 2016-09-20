@@ -15,18 +15,155 @@ import com.ibm.mq.jms.MQQueue;
 import com.ibm.mq.jms.MQQueueConnectionFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
 
 public class JMSClient {
 
-	/**
-	 * Empty constructor
-	 */
+    private static JMSConfiguration jmsC = new JMSConfiguration();
 
-	public JMSClient() {
+	public static void main(String args[]) {
 
-	}
+        if (args.length < 3) {
+            usage();
+            System.exit(0);
+        }
+
+        if (!readJMSConfiguration(args[2])) {
+
+            System.out.println("Failed to read JMS Configuration properties files.");
+            System.exit(3);
+        }
+
+        boolean rc = true;
+
+        switch (args[0]) {
+
+            case "-s" : rc = sendFiles(args[1]);
+                break;
+
+            case "-r" : rc = readMsgs(args[1]);
+                break;
+
+            default: usage();
+        }
+
+        if (!rc) {
+            System.exit(2);
+        } else {
+            System.exit(0);
+        }
+    }
+
+	private static void usage() {
+
+        System.out.println("JMSClient usage:");
+        System.out.println("Send files as text messages: jmsclient -s <srcDir> <JMS configuration properties file>");
+        System.out.println("Receive text messages and save them as files: jmsclient -r <toDir> <JMS configuration properties file>");
+    }
+
+	private static boolean readJMSConfiguration(String filename) {
+
+        Properties jmsProps = readPropsFile(filename);
+
+        if (!jmsProps.isEmpty()) {
+
+            jmsC.setHostname(jmsProps.getProperty("hostname", "localhost"));
+            jmsC.setPort(valueOf(jmsProps.getProperty("port", "1415")));
+            jmsC.setQmanager(jmsProps.getProperty("qmanager"));
+            jmsC.setChannel(jmsProps.getProperty("channel"));
+            jmsC.setDestination(jmsProps.getProperty("destination"));
+            jmsC.setUserID(jmsProps.getProperty("userID"));
+            jmsC.setPasswd(jmsProps.getProperty("passwd"));
+            jmsC.setTimeout(parseLong(jmsProps.getProperty("timeout", "1")));
+
+            return true;
+
+        } else {
+
+            return false;
+
+        }
+    }
+
+    static void setJmsC(JMSConfiguration jmsConfig) {
+
+        jmsC = jmsConfig;
+    }
+
+    /**
+     *  Send the files in the specified directory as text messages to the JMS destination
+     *  specified in the jmsconfig.properties file.
+     *
+     * @param srcDir The directory where the text files are located.
+     * @return Returns true if the operation completed successfully; else false.
+     */
+
+	 static boolean sendFiles(String srcDir) {
+
+        Path dir = Paths.get(srcDir);
+        List<String> msgs = new ArrayList<>();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
+
+            for (Path entry : stream) {
+                msgs.add(new String(Files.readAllBytes(Paths.get(entry.toString()))));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        System.out.println("Read messages from directory: " + srcDir);
+        return (writeMany(msgs));
+    }
+
+     static boolean readMsgs(String toDir) {
+
+         boolean rval = true;
+         List<String> msgs = readMany();
+
+         if (msgs.isEmpty()) {
+
+             System.out.println("No messages read ...");
+
+         } else {
+
+            int i = 0;
+
+             for (String msg : msgs) {
+
+                 StringBuilder sb = new StringBuilder(toDir);
+
+                 sb.append(File.separator);
+                 sb.append("msg");
+                 sb.append(Integer.valueOf(++i).toString());
+                 sb.append(".txt");
+
+                 try {
+
+                     Files.write(Paths.get(sb.toString()), msg.getBytes());
+
+                 } catch (IOException e) {
+
+                     e.printStackTrace();
+                     rval = false;
+                 }
+             }
+             System.out.println("Wrote messages to directory " + toDir);
+         }
+        return rval;
+    }
 
 	/**
 	 * Initialises JMS objects and returns a QueueConnection object
@@ -83,7 +220,7 @@ public class JMSClient {
 
             } else {
 
-                returnString = "No Message Read";
+                returnString = "No message read.";
             }
 
 		} catch (JMSException e) {
@@ -105,36 +242,41 @@ public class JMSClient {
 
 	public static List<String> readMany(JMSConfiguration jmsConfig) {
 
-		List<String> msgs = new ArrayList<>();
+        jmsC = jmsConfig;
 
-		try (QueueConnection queueConnection = initJMS(new MQQueueConnectionFactory(), jmsConfig)) {
-
-			queueConnection.start();
-
-			QueueSession session = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-			Queue queue = new MQQueue(jmsConfig.getDestination());
-			QueueReceiver queueRcvr = session.createReceiver(queue);
-
-			Message msg;
-
-			while ((msg = queueRcvr.receiveNoWait()) != null) {
-
-				msgs.add(((TextMessage) msg).getText());
-			}
-
-		} catch (JMSException e) {
-
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return msgs;
+        return readMany();
 	}
+
+	static List<String> readMany() {
+
+        List<java.lang.String> msgs = new ArrayList<>();
+
+        try (QueueConnection queueConnection = initJMS(new MQQueueConnectionFactory(), jmsC)) {
+
+            queueConnection.start();
+
+            QueueSession session = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+            Queue queue = new MQQueue(jmsC.getDestination());
+            QueueReceiver queueRcvr = session.createReceiver(queue);
+
+            Message msg;
+
+            while ((msg = queueRcvr.receiveNoWait()) != null) {
+
+                msgs.add(((TextMessage) msg).getText());
+            }
+        } catch (JMSException e) {
+
+            e.printStackTrace();
+        }
+        return msgs;
+    }
 
 	/**
 	 * Writes a message to a JMS destination.
 	 *
 	 * @param jmsConfig
-	 *            A configuration object that contains all the details for
+	 *            A configuration bean that contains all the details for
 	 *            connecting to a JMS destination
 	 * @param text
 	 *            The message that must be sent to the JMS destination. @return.
@@ -170,7 +312,7 @@ public class JMSClient {
 	 *
 	 * @param jmsConfig
 	 *            A configuration object that contains all the details for
-	 *            connecting to a JMS destination
+	 *            connecting to a JMS destination.
 	 * @param msgs
 	 *            An array of messages that must be sent to the JMS destination.
 	 *
@@ -181,30 +323,54 @@ public class JMSClient {
 
 	public static boolean writeMany(JMSConfiguration jmsConfig, List<String> msgs) {
 
-		boolean returnBool = true;
+        jmsC = jmsConfig;
 
-		try (QueueConnection queueConnection = initJMS(new MQQueueConnectionFactory(), jmsConfig)) {
-
-			queueConnection.start();
-
-			QueueSession session = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-			Queue queue = new MQQueue(jmsConfig.getDestination());
-			QueueSender qSender = session.createSender(queue);
-
-			Message msg;
-
-			for (String msgTxt : msgs) {
-
-				msg = session.createTextMessage(msgTxt);
-				qSender.send(msg);
-			}
-
-		} catch (JMSException e) {
-
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			returnBool = false;
-		}
-		return returnBool;
+        return writeMany(msgs);
 	}
+
+	public static boolean writeMany(List<String> msgs) {
+
+        boolean returnBool = true;
+
+        try (QueueConnection queueConnection = initJMS(new MQQueueConnectionFactory(), jmsC)) {
+
+            queueConnection.start();
+
+            QueueSession session = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+            Queue queue = new MQQueue(jmsC.getDestination());
+            QueueSender qSender = session.createSender(queue);
+
+            Message msg;
+
+            System.out.println("Sending " + msgs.size() + " messages.");
+
+            for (String msgTxt : msgs) {
+
+                msg = session.createTextMessage(msgTxt);
+                qSender.send(msg);
+            }
+
+        } catch (JMSException e) {
+
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            returnBool = false;
+        }
+        return returnBool;
+    }
+
+    public static Properties readPropsFile(String fProps) {
+
+        Properties prop = new Properties();
+
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        InputStream stream = loader.getResourceAsStream(fProps);
+
+        try {
+            prop.load(stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return prop;
+    }
 }

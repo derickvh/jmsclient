@@ -10,8 +10,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class JMSClientTest {
@@ -22,12 +23,12 @@ public class JMSClientTest {
     public static void configureJMS() {
 
         jmsC.setChannel("SERVCONN");
-        jmsC.setDestination("JMSQ1");
+        jmsC.setDestination("JMS1");
         jmsC.setHostname("localhost");
         jmsC.setQmanager("QMSPINOZA");
         jmsC.setPort(1415);
         jmsC.setUserID("derick");
-        jmsC.setPasswd("nopasswd");
+        jmsC.setPasswd("282ng#15");
         jmsC.setTimeout(1L);
     }
 
@@ -84,7 +85,32 @@ public class JMSClientTest {
 
         List<String> msgs = JMSClient.readMany(jmsC);
 
-        assertEquals(10, msgs.size());
+        assertNotNull(msgs);
         System.out.println("Read " + msgs.size() + " messages");
+    }
+
+    @Test
+    public void testSendFiles() {
+
+        JMSClient.setJmsC(jmsC);
+        assertTrue(JMSClient.sendFiles("/home/derick/messages"));
+
+    }
+
+    @Test
+    public void testWriteFiles() {
+
+        JMSClient.setJmsC(jmsC);
+        assertTrue(JMSClient.readMsgs("/home/derick/received"));
+
+    }
+
+    @Test
+    public void testReadPropsFile() {
+
+        Properties props = JMSClient.readPropsFile("jmsconfig.properties");
+
+        assertNotNull(props);
+        assertTrue(Integer.valueOf(props.getProperty("port")) == 1415);
     }
 }
