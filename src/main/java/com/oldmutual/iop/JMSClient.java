@@ -1,20 +1,11 @@
 
 package com.oldmutual.iop;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueReceiver;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-
 import com.ibm.mq.jms.MQQueue;
 import com.ibm.mq.jms.MQQueueConnectionFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
 
+import javax.jms.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,9 +20,35 @@ import java.util.Properties;
 import static java.lang.Integer.valueOf;
 import static java.lang.Long.parseLong;
 
+/**
+ * A JMS client for IBM MQ. The class has a number of static methods for reading and writing to JMS destinations.
+ *
+ */
+
 public class JMSClient {
 
     private static JMSConfiguration jmsC = new JMSConfiguration();
+
+    /**
+     * The main entry point to executing the methods to read messages from a file system directory
+     * or write messages read to a specified directory as text files.
+     * @param args the first parameter is either -s or -r (send or receive); the second
+     *             is the directory from which message files are read, or to which messages are to be
+     *             written as files. The third parameter is the name of a properties file for configuring
+     *             the IBM MQ environment.
+     *
+     *             The properties must be in the current directory and have the following
+     *             key/value pairs. Adjust to suit the MQ environment to be used:
+     *
+     *             host=localhost
+     *             port=1415
+     *             channel=SERVCONN
+     *             qmanager=QMGR1
+     *             destination=queue1
+     *             userID=mq_user
+     *             passwd=mq_passwd
+     *             timeout=5 (secs)
+     */
 
 	public static void main(String args[]) {
 
@@ -103,8 +120,7 @@ public class JMSClient {
     }
 
     /**
-     *  Send the files in the specified directory as text messages to the JMS destination
-     *  specified in the jmsconfig.properties file.
+     *  Send the files in the specified directory as text messages to the specified JMS destination.
      *
      * @param srcDir The directory where the text files are located.
      * @return Returns true if the operation completed successfully; else false.
@@ -127,6 +143,12 @@ public class JMSClient {
         System.out.println("Read messages from directory: " + srcDir);
         return (writeMany(msgs));
     }
+
+    /**
+     * Reads messages from the specified JMS destination and save them as text files to the specified directory.
+     * @param toDir The directory to which the text files are to be written.
+     * @return True if the operation completed successfully; false otherwise.
+     */
 
      static boolean readMsgs(String toDir) {
 
@@ -190,12 +212,12 @@ public class JMSClient {
 	}
 
 	/**
-	 * Reads a message from a JMS destination.
+	 * Reads a single message from a JMS destination.
 	 *
 	 * @param jmsConfig
 	 *            An instance of the Bean/Data class JMSConfiguration.
 	 * @return Returns the body of the message, which is expected to be of type
-	 *         'TextMessage'. Waits for 5 seconds for a message before
+	 *         'TextMessage'. Waits for specified number of seconds for a message to arrive before
 	 *         returning.
 	 *
 	 */
@@ -225,7 +247,6 @@ public class JMSClient {
 
 		} catch (JMSException e) {
 
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 
 		}
@@ -233,7 +254,8 @@ public class JMSClient {
 	}
 
 	/**
-	 * Reads multiple messages from a JMS destination.
+	 * Reads multiple messages from a JMS destination. Does not wait for messages to arrive. Terminates as soon
+     * it has read the last available message.
 	 *
 	 * @param jmsConfig
 	 *            Instance of a JMS Configuration bean.
