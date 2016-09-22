@@ -21,7 +21,17 @@ import static java.lang.Integer.valueOf;
 import static java.lang.Long.parseLong;
 
 /**
- * A JMS client for IBM MQ. The class has a number of static methods for reading and writing to JMS destinations.
+ * A JMS client with IBM MQ the JMS provider.
+ * The class has a number of static methods for reading and writing to JMS destinations.
+ * There are methods for sending and receiving single messages; multiple messages; messages read from a directory;
+ * messages written as text files to a directory.
+ *
+ *
+ * To initialise the JMS configuration either a properties file or a configuration bean, called JMSConfiguration,
+ * can be used
+ * .
+ * The properties file is only used when the main method of the JMSClient class is called. When the class is
+ * used as a library an instance of the JMSConfiguration class must be used to initialise the JMS/MQ configuration.
  *
  */
 
@@ -32,14 +42,16 @@ public class JMSClient {
     /**
      * The main entry point to executing the methods to read messages from a file system directory
      * or write messages read to a specified directory as text files.
+     *
      * @param args the first parameter is either -s or -r (send or receive); the second
      *             is the directory from which message files are read, or to which messages are to be
      *             written as files. The third parameter is the name of a properties file for configuring
-     *             the IBM MQ environment.
-     *
-     *             The properties must be in the current directory and have the following
+     *             the IBM JMS/MQ environment.
+     *             <p>
+     *             The properties file must be in the current directory and have the following
      *             key/value pairs. Adjust to suit the MQ environment to be used:
-     *
+     *             </p>
+     *             <p>
      *             host=localhost
      *             port=1415
      *             channel=SERVCONN
@@ -48,9 +60,10 @@ public class JMSClient {
      *             userID=mq_user
      *             passwd=mq_passwd
      *             timeout=5 (secs)
+     *             </p>
      */
 
-	public static void main(String args[]) {
+    public static void main(String args[]) {
 
         if (args.length < 3) {
             usage();
@@ -67,13 +80,16 @@ public class JMSClient {
 
         switch (args[0]) {
 
-            case "-s" : rc = sendFiles(args[1]);
+            case "-s":
+                rc = sendFiles(args[1]);
                 break;
 
-            case "-r" : rc = readMsgs(args[1]);
+            case "-r":
+                rc = readMsgs(args[1]);
                 break;
 
-            default: usage();
+            default:
+                usage();
         }
 
         if (!rc) {
@@ -83,14 +99,14 @@ public class JMSClient {
         }
     }
 
-	private static void usage() {
+    private static void usage() {
 
         System.out.println("JMSClient usage:");
         System.out.println("Send files as text messages: jmsclient -s <srcDir> <JMS configuration properties file>");
         System.out.println("Receive text messages and save them as files: jmsclient -r <toDir> <JMS configuration properties file>");
     }
 
-	private static boolean readJMSConfiguration(String filename) {
+    private static boolean readJMSConfiguration(String filename) {
 
         Properties jmsProps = readPropsFile(filename);
 
@@ -110,23 +126,38 @@ public class JMSClient {
         } else {
 
             return false;
-
         }
     }
 
-    static void setJmsC(JMSConfiguration jmsConfig) {
-
-        jmsC = jmsConfig;
-    }
-
     /**
-     *  Send the files in the specified directory as text messages to the specified JMS destination.
+     * Sends the files in the specified directory as text messages to the specified JMS destination.
      *
      * @param srcDir The directory where the text files are located.
      * @return Returns true if the operation completed successfully; else false.
      */
 
-	 static boolean sendFiles(String srcDir) {
+    public static boolean sendFiles(String srcDir) {
+
+        List<String> msgs = readFiles(srcDir);
+
+        return !msgs.isEmpty() && writeMany(msgs);
+    }
+
+    /**
+     * Sends the files in the specified directory as text messages to the specified JMS destination
+     *
+     * @param jmsConfig An instance of a JMS configuration bean
+     * @param srcDir    The directory where text files are located.
+     * @return True if the operation completed successfully; else false.
+     */
+    public static boolean sendFiles(JMSConfiguration jmsConfig, String srcDir) {
+
+        List<String> msgs = readFiles(srcDir);
+
+        return !msgs.isEmpty() && writeMany(jmsConfig, msgs);
+    }
+
+    private static List<String> readFiles(String srcDir) {
 
         Path dir = Paths.get(srcDir);
         List<String> msgs = new ArrayList<>();
@@ -138,10 +169,8 @@ public class JMSClient {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
         }
-        System.out.println("Read messages from directory: " + srcDir);
-        return (writeMany(msgs));
+       return msgs;
     }
 
     /**
@@ -150,48 +179,62 @@ public class JMSClient {
      * @return True if the operation completed successfully; false otherwise.
      */
 
-     static boolean readMsgs(String toDir) {
+    public static boolean readMsgs(String toDir) {
 
-         boolean rval = true;
-         List<String> msgs = readMany();
+         return writeMsgsToFile(toDir, readMany());
+    }
 
-         if (msgs.isEmpty()) {
+    /**
+     * Reads messages from the specified JMS destination and save them as text files to the specified directory.
+     * @param jmsConfig An instance on a JMS Configuration bean
+     * @param toDir The directory to which the text files are to be written.
+     * @return True if the operation completed successfully; false otherwise.
+     */
 
-             System.out.println("No messages read ...");
+    public static boolean readMsgs(JMSConfiguration jmsConfig, String toDir) {
 
-         } else {
+        return writeMsgsToFile(toDir, readMany(jmsConfig));
+    }
+
+    private static boolean writeMsgsToFile(String toDir, List<String>msgs) {
+
+        boolean rval = true;
+
+        if (msgs.isEmpty()) {
+
+            System.out.println("No message files written ...");
+
+        } else {
 
             int i = 0;
 
-             for (String msg : msgs) {
+            for (String msg : msgs) {
 
-                 StringBuilder sb = new StringBuilder(toDir);
+                StringBuilder sb = new StringBuilder(toDir);
 
-                 sb.append(File.separator);
-                 sb.append("msg");
-                 sb.append(Integer.valueOf(++i).toString());
-                 sb.append(".txt");
+                sb.append(File.separator);
+                sb.append("msg");
+                sb.append(Integer.valueOf(++i).toString());
+                sb.append(".txt");
 
-                 try {
+                try {
 
-                     Files.write(Paths.get(sb.toString()), msg.getBytes());
+                    Files.write(Paths.get(sb.toString()), msg.getBytes());
 
-                 } catch (IOException e) {
+                } catch (IOException e) {
 
-                     e.printStackTrace();
-                     rval = false;
-                 }
-             }
-             System.out.println("Wrote messages to directory " + toDir);
-         }
+                    e.printStackTrace();
+                    rval = false;
+                }
+            }
+            System.out.println("Wrote messages to directory " + toDir);
+        }
         return rval;
     }
 
-	/**
+    /**
 	 * Initialises JMS objects and returns a QueueConnection object
 	 *
-	 * @param qcf
-	 *            MQQueueConnectionFactory
 	 * @param jmsConfig
 	 *            A JMSConfiguration object
 	 * @return A queue connection object
@@ -199,10 +242,12 @@ public class JMSClient {
      * Throws a JMS exception.
 	 */
 
-	private static QueueConnection initJMS(MQQueueConnectionFactory qcf, JMSConfiguration jmsConfig)
+	private static QueueConnection initJMS(JMSConfiguration jmsConfig)
 			throws JMSException {
 
-		qcf.setHostName(jmsConfig.getHostname());
+        MQQueueConnectionFactory qcf = new MQQueueConnectionFactory();
+
+        qcf.setHostName(jmsConfig.getHostname());
 		qcf.setPort(jmsConfig.getPort());
 		qcf.setQueueManager(jmsConfig.getQmanager());
 		qcf.setChannel(jmsConfig.getChannel());
@@ -226,7 +271,7 @@ public class JMSClient {
 
 		String returnString = null;
 
-		try (QueueConnection qConn = initJMS(new MQQueueConnectionFactory(), jmsConfig)) {
+		try (QueueConnection qConn = initJMS(jmsConfig)) {
 
 			qConn.start();
 
@@ -269,11 +314,17 @@ public class JMSClient {
         return readMany();
 	}
 
-	static List<String> readMany() {
+    /**
+     * Reads multiple messages from a JMS destination. Does not wait for messages to arrive. Terminates as soon
+     * it has read the last available message.
+     * @return A list of messages read.
+     */
+
+	public static List<String> readMany() {
 
         List<java.lang.String> msgs = new ArrayList<>();
 
-        try (QueueConnection queueConnection = initJMS(new MQQueueConnectionFactory(), jmsC)) {
+        try (QueueConnection queueConnection = initJMS(jmsC)) {
 
             queueConnection.start();
 
@@ -301,14 +352,14 @@ public class JMSClient {
 	 *            A configuration bean that contains all the details for
 	 *            connecting to a JMS destination
 	 * @param text
-	 *            The message that must be sent to the JMS destination. @return.
-	 *            Returns true if the message was successfully transmitted.
+	 *            The message that must be sent to the JMS destination.
+     * @return True if the message was successfully transmitted.
 	 */
 	public static boolean write(JMSConfiguration jmsConfig, String text) {
 
 		boolean returnBool = true;
 
-		try (QueueConnection queueConnection = initJMS(new MQQueueConnectionFactory(), jmsConfig)) {
+		try (QueueConnection queueConnection = initJMS(jmsConfig)) {
 
 			queueConnection.start();
 
@@ -333,13 +384,12 @@ public class JMSClient {
 	 * Writes multiple messages to a JMS destination.
 	 *
 	 * @param jmsConfig
-	 *            A configuration object that contains all the details for
+	 *            A configuration object bean that contains all the details for
 	 *            connecting to a JMS destination.
 	 * @param msgs
-	 *            An array of messages that must be sent to the JMS destination.
+	 *            A list of messages that must be sent to the JMS destination.
+	 * @return True if the messages were successfully transmitted.
 	 *
-	 * 			@return Returns true if the messages were successfully
-	 *            transmitted.
 	 *
 	 **/
 
@@ -350,11 +400,18 @@ public class JMSClient {
         return writeMany(msgs);
 	}
 
+    /**
+     * Writes multiple messages to a JMS destination.
+     * @param msgs A list of messages that must be sent to the JMS destination.
+     * @return True if the messages were successfully transmitted.
+     *
+     */
+
 	public static boolean writeMany(List<String> msgs) {
 
         boolean returnBool = true;
 
-        try (QueueConnection queueConnection = initJMS(new MQQueueConnectionFactory(), jmsC)) {
+        try (QueueConnection queueConnection = initJMS(jmsC)) {
 
             queueConnection.start();
 
@@ -381,7 +438,13 @@ public class JMSClient {
         return returnBool;
     }
 
-    public static Properties readPropsFile(String fProps) {
+    /**
+     * Reads JMS configuration properties from a properties file. By convention it is named, jmsconfig.properties
+     * @param fProps The name of the properties file.
+     * @return A java.util.Properties object populated with properties read from the properties file.
+     */
+
+    static Properties readPropsFile(String fProps) {
 
         Properties prop = new Properties();
 

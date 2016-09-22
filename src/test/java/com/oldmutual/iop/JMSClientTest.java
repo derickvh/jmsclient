@@ -92,17 +92,13 @@ public class JMSClientTest {
     @Test
     public void testSendFiles() {
 
-        JMSClient.setJmsC(jmsC);
-        assertTrue(JMSClient.sendFiles("/home/derick/messages"));
-
+        assertTrue(JMSClient.sendFiles(jmsC, "/home/derick/messages"));
     }
 
     @Test
     public void testWriteFiles() {
 
-        JMSClient.setJmsC(jmsC);
-        assertTrue(JMSClient.readMsgs("/home/derick/received"));
-
+        assertTrue(JMSClient.readMsgs(jmsC, "/home/derick/received"));
     }
 
     @Test

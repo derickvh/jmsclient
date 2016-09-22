@@ -1,5 +1,4 @@
 #!/usr/bin/env groovy
-package com.oldmutual.iop
 
 import static java.lang.Integer.valueOf
 
