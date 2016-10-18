@@ -28,8 +28,8 @@ import static java.lang.Long.parseLong;
  *
  *
  * To initialise the JMS configuration either a properties file or a configuration bean, called JMSConfiguration,
- * can be used
- * .
+ * can be used.
+ *
  * The properties file is only used when the main method of the JMSClient class is called. When the class is
  * used as a library an instance of the JMSConfiguration class must be used to initialise the JMS/MQ configuration.
  *
@@ -245,15 +245,15 @@ public class JMSClient {
 	private static QueueConnection initJMS(JMSConfiguration jmsConfig)
 			throws JMSException {
 
-        MQQueueConnectionFactory qcf = new MQQueueConnectionFactory();
+        MQQueueConnectionFactory mqQueueConnectionFactory = new MQQueueConnectionFactory();
 
-        qcf.setHostName(jmsConfig.getHostname());
-		qcf.setPort(jmsConfig.getPort());
-		qcf.setQueueManager(jmsConfig.getQmanager());
-		qcf.setChannel(jmsConfig.getChannel());
-		qcf.setTransportType(WMQConstants.WMQ_CM_CLIENT);
+        mqQueueConnectionFactory.setHostName(jmsConfig.getHostname());
+        mqQueueConnectionFactory.setPort(jmsConfig.getPort());
+        mqQueueConnectionFactory.setQueueManager(jmsConfig.getQmanager());
+        mqQueueConnectionFactory.setChannel(jmsConfig.getChannel());
+        mqQueueConnectionFactory.setTransportType(WMQConstants.WMQ_CM_CLIENT);
 
-		return qcf.createQueueConnection(jmsConfig.getUserID(), jmsConfig.getPasswd());
+		return mqQueueConnectionFactory.createQueueConnection(jmsConfig.getUserID(), jmsConfig.getPasswd());
 	}
 
 	/**

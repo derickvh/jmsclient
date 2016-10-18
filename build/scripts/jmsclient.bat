@@ -49,7 +49,6 @@ goto fail
 @rem Get command-line arguments, handling Windows variants
 
 if not "%OS%" == "Windows_NT" goto win9xME_args
-if "%@eval[2+2]" == "4" goto 4NT_args
 
 :win9xME_args
 @rem Slurp the command line arguments.
@@ -60,16 +59,11 @@ set _SKIP=2
 if "x%~1" == "x" goto execute
 
 set CMD_LINE_ARGS=%*
-goto execute
-
-:4NT_args
-@rem Get arguments from the 4NT Shell from JP Software
-set CMD_LINE_ARGS=%$
 
 :execute
 @rem Setup the command line
 
-set CLASSPATH=%APP_HOME%\lib\jmsclient.jar;%APP_HOME%\lib\fscontext.jar;%APP_HOME%\lib\JSON4J.jar;%APP_HOME%\lib\jms.jar;%APP_HOME%\lib\com.ibm.mq.allclient.jar;%APP_HOME%\lib\com.ibm.mq.traceControl.jar;%APP_HOME%\lib\providerutil.jar
+set CLASSPATH=%APP_HOME%\lib\jmsclient-1.2.jar;%APP_HOME%\lib\com.ibm.mq.allclient.jar;%APP_HOME%\lib\jms.jar
 
 @rem Execute jmsclient
 "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %JMSCLIENT_OPTS%  -classpath "%CLASSPATH%" com.oldmutual.iop.JMSClient %CMD_LINE_ARGS%

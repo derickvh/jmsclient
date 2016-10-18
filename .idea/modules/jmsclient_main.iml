@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="jmsclient:main" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="" external.system.module.type="sourceSet" external.system.module.version="1.0" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
+<module external.linked.project.id="jmsclient:main" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="" external.system.module.type="sourceSet" external.system.module.version="1.2" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../../build/classes/main" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../src/main">
@@ -27,7 +27,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="groovy-2.4.7" level="application" />
     <orderEntry type="library" name="groovy-2.4.7" level="application" />
   </component>
 </module>
