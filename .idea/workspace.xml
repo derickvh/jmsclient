@@ -4,14 +4,8 @@
     <option name="SCOPE_TYPE" value="4" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4590c87b-524b-4a9a-adc2-c37e089c4fd4" name="Default" comment="Added Javadoc comments. Refactored some JMSClient methods to make them easier to use in SoapUI groovy scripts.">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/jmsclient.iml" afterPath="$PROJECT_DIR$/.idea/modules/jmsclient.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/jmsclient_main.iml" afterPath="$PROJECT_DIR$/.idea/modules/jmsclient_main.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/jmsclient_test.iml" afterPath="$PROJECT_DIR$/.idea/modules/jmsclient_test.iml" />
+    <list default="true" id="4590c87b-524b-4a9a-adc2-c37e089c4fd4" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/scripts/jmsclient" afterPath="$PROJECT_DIR$/build/scripts/jmsclient" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/scripts/jmsclient.bat" afterPath="$PROJECT_DIR$/build/scripts/jmsclient.bat" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/oldmutual/iop/JMSClient.java" afterPath="$PROJECT_DIR$/src/main/java/com/oldmutual/iop/JMSClient.java" />
     </list>
     <ignored path="jmsclient.iws" />
@@ -83,8 +77,8 @@
       <file leaf-file-name="JMSClient.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/oldmutual/iop/JMSClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="31" column="3" selection-start-line="31" selection-start-column="3" selection-end-line="31" selection-end-column="3" />
+            <state relative-caret-position="184">
+              <caret line="217" column="4" selection-start-line="217" selection-start-column="4" selection-end-line="217" selection-end-column="4" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -660,7 +654,14 @@
       <option name="project" value="LOCAL" />
       <updated>1474372901787</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Expanded Javadoc comments.">
+      <created>1476780792139</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1476780792139</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -744,7 +745,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added Javadoc comments" />
     <MESSAGE value="Added Javadoc comments. Refactored some JMSClient methods to make them easier to use in SoapUI groovy scripts." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Javadoc comments. Refactored some JMSClient methods to make them easier to use in SoapUI groovy scripts." />
+    <MESSAGE value="Expanded Javadoc comments." />
+    <option name="LAST_COMMIT_MESSAGE" value="Expanded Javadoc comments." />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -964,8 +966,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/oldmutual/iop/JMSClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="31" column="3" selection-start-line="31" selection-start-column="3" selection-end-line="31" selection-end-column="3" />
+        <state relative-caret-position="184">
+          <caret line="217" column="4" selection-start-line="217" selection-start-column="4" selection-end-line="217" selection-end-column="4" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

@@ -21,17 +21,22 @@ import static java.lang.Integer.valueOf;
 import static java.lang.Long.parseLong;
 
 /**
- * A JMS client with IBM MQ the JMS provider.
+ * A JMS client that uses IBM MQ as the JMS provider.
  * The class has a number of static methods for reading and writing to JMS destinations.
  * There are methods for sending and receiving single messages; multiple messages; messages read from a directory;
  * messages written as text files to a directory.
- *
  *
  * To initialise the JMS configuration either a properties file or a configuration bean, called JMSConfiguration,
  * can be used.
  *
  * The properties file is only used when the main method of the JMSClient class is called. When the class is
  * used as a library an instance of the JMSConfiguration class must be used to initialise the JMS/MQ configuration.
+ *
+ * A wrapper script 'jmsclient' is used to run the JMSClient and it takes 3 parameters.
+ *
+ *  The first parameter is either -s or -r (send or receive); the second is the directory from which
+ *  message files are read, or to which messages are to be written as files; the third is the name of a properties file
+ *  for configuring the IBM JMS/MQ environment.
  *
  */
 
@@ -43,7 +48,7 @@ public class JMSClient {
      * The main entry point to executing the methods to read messages from a file system directory
      * or write messages read to a specified directory as text files.
      *
-     * @param args the first parameter is either -s or -r (send or receive); the second
+     * @param args The first parameter is either -s or -r (send or receive); the second
      *             is the directory from which message files are read, or to which messages are to be
      *             written as files. The third parameter is the name of a properties file for configuring
      *             the IBM JMS/MQ environment.
@@ -51,16 +56,18 @@ public class JMSClient {
      *             The properties file must be in the current directory and have the following
      *             key/value pairs. Adjust to suit the MQ environment to be used:
      *             </p>
-     *             <p>
-     *             host=localhost
-     *             port=1415
-     *             channel=SERVCONN
-     *             qmanager=QMGR1
-     *             destination=queue1
-     *             userID=mq_user
-     *             passwd=mq_passwd
-     *             timeout=5 (secs)
-     *             </p>
+     *
+     *              <ul>
+     *                 <li>host=localhost</li>
+     *                 <li>port=1415</li>
+     *                 <li>channel=SERVCONN</li>
+     *                 <li>qmanager=QMGR1</li>
+     *                 <li>destination=queue1</li>
+     *                 <li>userID=mq_user</li>
+     *                 <li>passwd=mq_passwd</li>
+     *                  <li>timeout=5 (secs)</li>
+     *              </ul>
+     *
      */
 
     public static void main(String args[]) {
@@ -106,6 +113,22 @@ public class JMSClient {
         System.out.println("Receive text messages and save them as files: jmsclient -r <toDir> <JMS configuration properties file>");
     }
 
+    /**
+     * Method to read a JMS configuration from a Java properties file.
+     * @param filename The name of the properties file that contains JMS configuration information.
+     *                 The following properties must be provided in the properties file.
+     *                 - hostname (FQDN, IP address, or simple name such as 'localhost') of the server
+     *                   hosting the IBM MQ Queue Manager
+     *                 - port (typically 1414. The port on which the MQ listener listens for incoming connections)
+     *                 - qmanager (Name of the MQ Queue Manager that provides JMS services)
+     *                 - channel (Name of the server connection channel)
+     *                 - destination (Name of the MQ queue which serves as a JMS destination)
+     *                 - userID (User ID of the connecting client)
+     *                 - passwd (Password of the User ID)
+     *                 - timeout (Number of seconds to wait for messages to arrive at JMS destination)
+     * @return  True, if properties file was read and JMSConfiguration object configured. False, otherwise.
+     */
+
     private static boolean readJMSConfiguration(String filename) {
 
         Properties jmsProps = readPropsFile(filename);
@@ -131,7 +154,8 @@ public class JMSClient {
 
     /**
      * Sends the files in the specified directory as text messages to the specified JMS destination.
-     *
+     * This method is used when the main method is used and the JMS configuration is read from a
+     * Java properties file.
      * @param srcDir The directory where the text files are located.
      * @return Returns true if the operation completed successfully; else false.
      */
@@ -372,7 +396,6 @@ public class JMSClient {
 
 		} catch (JMSException e) {
 
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			returnBool = false;
 
@@ -431,7 +454,6 @@ public class JMSClient {
 
         } catch (JMSException e) {
 
-            // TODO Auto-generated catch block
             e.printStackTrace();
             returnBool = false;
         }
@@ -439,7 +461,8 @@ public class JMSClient {
     }
 
     /**
-     * Reads JMS configuration properties from a properties file. By convention it is named, jmsconfig.properties
+     * Reads JMS configuration properties from a properties file. By convention it is named, jmsconfig.properties.
+     * This file must be in the directory from where the JMSClient is run.
      * @param fProps The name of the properties file.
      * @return A java.util.Properties object populated with properties read from the properties file.
      */
