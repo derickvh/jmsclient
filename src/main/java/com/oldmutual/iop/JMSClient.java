@@ -43,6 +43,7 @@ import static java.lang.Long.parseLong;
 public class JMSClient {
 
     private static JMSConfiguration jmsC = new JMSConfiguration();
+    private static MQQueueConnectionFactory mqQueueConnectionFactory = new MQQueueConnectionFactory();
 
     /**
      * The main entry point to executing the methods to read messages from a file system directory
@@ -268,8 +269,6 @@ public class JMSClient {
 
 	private static QueueConnection initJMS(JMSConfiguration jmsConfig)
 			throws JMSException {
-
-        MQQueueConnectionFactory mqQueueConnectionFactory = new MQQueueConnectionFactory();
 
         mqQueueConnectionFactory.setHostName(jmsConfig.getHostname());
         mqQueueConnectionFactory.setPort(jmsConfig.getPort());
