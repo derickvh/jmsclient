@@ -28,7 +28,7 @@ public class JMSClientTest {
         jmsC.setQmanager("QMSPINOZA");
         jmsC.setPort(1415);
         jmsC.setUserID("derick");
-        jmsC.setPasswd("282ng#15");
+        jmsC.setPasswd("nopasswd");
         jmsC.setTimeout(1L);
     }
 
