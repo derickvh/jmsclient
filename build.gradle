@@ -23,6 +23,7 @@ repositories {
 dependencies {
 
 	compile files('/home/derick/wmqlibs/com.ibm.mq.allclient.jar','/home/derick/wmqlibs/jms.jar')
+	compile group: 'javax.jms', name: 'javax.jms-api', version: '2.0.1'
 
 	testCompile "junit:junit:4.11"
 }

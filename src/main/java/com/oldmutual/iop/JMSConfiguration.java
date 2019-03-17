@@ -1,43 +1,19 @@
 package com.oldmutual.iop;
 
-import javax.xml.bind.annotation.*;
-
-
 /**
  * A Java Bean that contains information to configure an IBM MQ environment to provide JMS functionality.
  */
 
 
-@XmlRootElement(name = "JMSConfiguration", namespace = "##default")
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = {
-        "hostname",
-        "port",
-        "qmanager",
-        "channel",
-        "userID",
-        "passwd",
-        "destination",
-        "timeout"
-})
-
 public class JMSConfiguration {
 
-    @XmlElement(name = "hostname", required = true)
     private String hostname;
-    @XmlElement(name = "port", required = true)
     private int port;
-    @XmlElement(name = "qmanager", required = true)
     private String qmanager;
-    @XmlElement(name = "channel", required = true)
     private String channel;
-    @XmlElement(name = "userID", required = true)
     private String userID;
-    @XmlElement(name = "passwd", required = true)
     private String passwd;
-    @XmlElement(name = "destination", required = true)
     private String destination;
-    @XmlElement(name = "timeout", required = true)
     private long timeout;
 
     public JMSConfiguration() {
